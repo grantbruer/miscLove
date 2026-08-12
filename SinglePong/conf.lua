@@ -1,8 +1,4 @@
 
 function love.conf(t)
-
-	t.window.width = 800
-	t.window.height = 600
-
-
+    t.version = "11.5"                  -- The LÖVE version this game was made for (string)
 end

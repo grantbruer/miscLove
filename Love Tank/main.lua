@@ -759,13 +759,13 @@ function love.load()
 		table.insert(playercirclepoints, y)
 		x = x + 5
 	end
-	x = playerradius
-	while x >= -playerradius do
+	x = playerradius - 5
+	while x > -playerradius do
 		y = -(  (playerradius^2) - (x^2)     )^.5
 		table.insert(playercirclepoints, x)
 		table.insert(playercirclepoints, y)
 		x = x - 5
-	end	
+	end
 	
 	player = {}
 	player.body = love.physics.newBody(world, 0,0, "dynamic")
@@ -897,7 +897,7 @@ function love.load()
 	
 	
 	min_dt = 1/FPS
-    next_time = love.timer.getMicroTime()
+    next_time = love.timer.getTime()
    
 end
 
@@ -905,7 +905,7 @@ end
 stopenemies = false
 
 function love.keypressed(key)
-	if key == " " then
+	if key == "space" then
 		firing = not firing
 	elseif key == "r" then
 		player.body:setPosition(WINDOWWIDTH/2, WINDOWHEIGHT/2)
@@ -1015,7 +1015,7 @@ function love.update(dt)
 			b = mousey - mousex*slope
 		end
 		
-		if not love.mouse.isDown("r")  then
+		if not love.mouse.isDown(2)  then
 			if math.abs(mousex-x) > 0 or math.abs(mousey-y) > 0 then
 				if mousex < x then
 					playerrotation = math.atan(slope) + math.rad(90)
@@ -1035,21 +1035,28 @@ function love.update(dt)
 			end
 		end
 
-		if playermissileslowdown > PLAYERMISSILESLOWDOWN and love.mouse.isDown("l") then 
+		if playermissileslowdown > PLAYERMISSILESLOWDOWN and love.mouse.isDown(1) then 
 			
 			for i in pairs(playerlaunchers) do
 				x1,y1, x2,y2,x3,y3,x4,y4 = playerlaunchers[i].body:getWorldPoints(playerlaunchers[i].shape:getPoints())
-				angle = math.deg(playerlaunchers[i].body:getAngle())
-				
-				xspeed = (  ((PLAYERMISSILESPEED^2)*(x4-x1)^2)/ (  ((y4-y1)^2) +  ((x4-x1)^2)  )      ) ^.5 
-				x = player.body:getX()
-				centerx = (x1+x2)/2
-				if centerx < x then
-					xspeed = -math.abs(xspeed)
-				end
-				yspeed = ((y4-y1)*xspeed)/(x4-x1)
-				table.insert(playermissiles, {})
+				angle = playerlaunchers[i].body:getAngle()
+				yspeed = math.cos(angle) * PLAYERMISSILESPEED
+				xspeed = -math.sin(angle) * PLAYERMISSILESPEED
+
 				x,y = player.body:getPosition()
+				-- yspeed = (  ((PLAYERMISSILESPEED^2)*(y4-y1)^2)/ (  ((y4-y1)^2) +  ((x4-x1)^2)  )      ) ^.5 
+				-- centery = (y1+y2)/2
+				-- if centery < y then
+				-- 	yspeed = -math.abs(yspeed)
+				-- end
+
+				-- xspeed = math.abs(((x4-x1)*yspeed)/(y4-y1))
+				-- centerx = (x1+x2)/2
+				-- if centerx < x then
+				-- 	xspeed = -math.abs(xspeed)
+				-- end
+
+				table.insert(playermissiles, {})
 				playermissiles[#playermissiles].body = love.physics.newBody(world, x,y, "dynamic", 20)
 				playermissiles[#playermissiles].shape = love.physics.newCircleShape(missileradius)
 				playermissiles[#playermissiles].fixture = love.physics.newFixture(playermissiles[#playermissiles].body, playermissiles[#playermissiles].shape)
@@ -1536,7 +1543,7 @@ function love.draw(dt)
 		
 	end ]]
 	
-	local cur_time = love.timer.getMicroTime()
+	local cur_time = love.timer.getTime()
 	if next_time <= cur_time then
 	  next_time = cur_time
 	  return

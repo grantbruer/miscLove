@@ -1,18 +1,35 @@
 
+local major, minor, revision, codename = love.getVersion()
+print(string.format("Using compatibility profile for version %d.%d.%d", major, minor, revision))
+local version10 = (major == 0 and minor == 10)
+if not version10 then
+    -- Convert colors from [0,255] to [0,1]
+    local oldSetColor = love.graphics.setColor
+    function love.graphics.setColor(r, g, b, a)
+        if type(r) == 'table' then
+            g = r[2]
+            b = r[3]
+            a = r[4]
+            r = r[1]
+        end
+        g = g/255
+        b = b/255
+        a = a and a/255
+        r = r/255
+        oldSetColor(r,g,b,a)
+    end
+end
+
 function love.load()
 	
-	player = {x=50,y = 50}
-	
-	point = {x=500,y=10}
+	point = {x=500,y=100}
 	line = {250,350,  550,300}
 	lineslope = (line[2]-line[4])/(line[1]-line[3])
 	lineyinter = line[2] - lineslope * line[1]
 	
 	rectangle1 = {x=0,y=0,width=30,height=30}
-	rectangle2 = {x=100,y=400,width=300,height=300}
-	speed = 1
-	
-	pentagon = {0,0,10,-6, 15,5, 10, 11,  3,7, 0,0}
+	-- rectangle2 = {x=100,y=400,width=300,height=300}
+	speed = 1	
 end
 
 
@@ -63,7 +80,7 @@ function love.draw()
 	love.graphics.line(unpack(line))
 	
 	local length = (rectangle1.x - point.x)^2 + (rectangle1.y-point.y)^2
-	love.graphics.setLineWidth(150000/length)
+	love.graphics.setLineWidth(1 + 150000/length)
 	love.graphics.setColor(255,255,255)
 	love.graphics.line(rectangle1.x,rectangle1.y, point.x,point.y)
 	
@@ -88,6 +105,19 @@ function love.draw()
 	love.graphics.print("Y2: " .. tostring(y2),375,30)
 	love.graphics.print("Y3: " .. tostring(y3),375,50)
 	love.graphics.print("Y4: " .. tostring(y4),375,70)
+
+
+	love.graphics.print("R1 x: " .. tostring(rectangle1.x),300,110)
+	love.graphics.print("R1 y: " .. tostring(rectangle1.y),300,130)
+	love.graphics.print("P x: " .. tostring(point.x),300,150)
+	love.graphics.print("P y: " .. tostring(point.y),300,170)
+
+
+	love.graphics.print("L1: " .. tostring(line[1]),375,110)
+	love.graphics.print("L2: " .. tostring(line[2]),375,130)
+	love.graphics.print("L3: " .. tostring(line[3]),375,150)
+	love.graphics.print("L4: " .. tostring(line[4]),375,170)
+
 	--love.graphics.print(tostring(x and y), 350,18)
 	
 	love.graphics.rectangle('line', line[1],line[2], line[3]-line[1], line[4]-line[2])
